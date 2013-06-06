@@ -1,10 +1,10 @@
 I am new to Python and came here to practice and understand what Pythonic is.    
 
->>> import this
+>>> import this    
+
 The Zen of Python, by Tim Peters     
 
 Beautiful is better than ugly.     
-
 Explicit is better than implicit.     
 Simple is better than complex.     
 Complex is better than complicated.     
