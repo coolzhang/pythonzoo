@@ -2,6 +2,12 @@
 #
 # check_big_log_updated_frequently.py
 # Thanks to @limodou & mao(Kingsoft)
+#
+# Test Case:
+# shell> printf "1. ERROR LINE\n" >> mysql-error.log  # whole line check
+# shell> printf "2. ERROR not EOF," >> mysql-error.log
+# shell> printf " now EOF\n" >> mysql-error.log       # half line check
+
 
 import time
 
