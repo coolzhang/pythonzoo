@@ -67,11 +67,7 @@ class Completer:
                 return None
 
 def mysqlplus_options():
-<<<<<<< HEAD
     USAGE = "%prog -u username -p [password] [-H Host:Port/service_name #easy_connect]"
-=======
-    USAGE = "%prog -u username -p [password]"
->>>>>>> origin/master
     DESCRIPTION = "Use SQL*PLUS like mysql style"
     VERSION = "%prog Alpha"
 
@@ -103,22 +99,13 @@ def mysqlplus_options():
         'user': user,
         'password': password,
         'host': host if host else '',
-<<<<<<< HEAD
-=======
-#        'sname': sname if sname else ''
->>>>>>> origin/master
         }
 
     return MYOPTIONS
 
-<<<<<<< HEAD
 def cmd_mapping(mysql_cmd, user):
     mysql_cmd = mysql_cmd.split()
     username = user
-=======
-def cmd_mapping(mysql_cmd):
-    mysql_cmd = mysql_cmd.split()
->>>>>>> origin/master
 
     if len(mysql_cmd) == 1:
         cmd_key = ' '.join(mysql_cmd).strip(';')
@@ -131,16 +118,10 @@ def cmd_mapping(mysql_cmd):
         if mysql_cmd[0] == "use":
             if mysql_cmd[1] == username:
                 print "Current schema is already [ %s ]" % username
-<<<<<<< HEAD
                 sqlplus_cmd = cmd_mapping_m2o[mysql_cmd[0]] + " " + username +"/******"
             else:
                 new_username = mysql_cmd[1]
                 sys.exit("Please re-run mysqlplus to login via %s" % new_username)
-=======
-                sqlplus_cmd = cmd_mapping_m2o[mysql_cmd[0]] + " " + username + "/" + password
-            else:
-                print "Please re-run mysqlplus to login via %s" % username
->>>>>>> origin/master
         elif mysql_cmd[0] == "show" or mysql_cmd[0] == "select":
             cmd_key = ' '.join(mysql_cmd).strip(';') + ";"
             try:
@@ -182,7 +163,6 @@ def input_loop(logon):
                 show_cmd_mapping_help()
                 print
             else:
-<<<<<<< HEAD
                 if mysql_cmd.split()[0] == 'use':
                     user = logon.split('/')[0]
                     oracle_cmd = cmd_mapping(mysql_cmd, user)
@@ -199,15 +179,6 @@ def input_loop(logon):
                     account = logon
                     res, errmsg = run_mysqlplus_cmd(oracle_cmd, account)
                     print res
-=======
-                oracle_cmd = cmd_mapping(mysql_cmd)
-                print "-------"
-                print "Mapping to SQL*Plus Command: %s" % oracle_cmd
-                print "-------"
-                account = logon
-                res, errmsg = run_mysqlplus_cmd(oracle_cmd, account)
-                print res
->>>>>>> origin/master
         except KeyError:
             break
 
@@ -227,11 +198,7 @@ def sqlplus_logon():
 
     return logon
 
-<<<<<<< HEAD
 def check_logon():
-=======
-def logon_check():
->>>>>>> origin/master
     cmd = 'select 1+1 from dual;'
     account = sqlplus_logon()
     res, errmsg = run_mysqlplus_cmd(cmd, account)
@@ -271,11 +238,7 @@ if __name__ == "__main__":
     readline.set_completer(completer.complete)
 
     if getpass.getuser() == "oracle":
-<<<<<<< HEAD
         logon = check_logon()
-=======
-        logon = logon_check()
->>>>>>> origin/master
         db_concepts()
         input_loop(logon)
     else:
