@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 I am new to Python and came here to practice and understand what Pythonic is...:P    
+=======
+I am new to Python and came here to practice and understand what Pythonic is.    
+>>>>>>> origin/master
 
 >>> import this    
 
