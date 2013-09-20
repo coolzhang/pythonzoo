@@ -31,7 +31,6 @@ optparser.add_option("-m", "--set", action='store', dest="setopt",
 config = ConfigParser.SafeConfigParser()
 config.read(options.mycnf)
 
-
 def show_variable():
     try:
         if options.getopt == 'all':
