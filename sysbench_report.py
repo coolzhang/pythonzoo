@@ -1,5 +1,5 @@
 #!/bin/env python
-#  Author to: {@拉风_zhang: vj.zhanghai@gmail.com}
+#  Author to: {lafeng: vj.zhanghai@gmail.com}
 #  Thanks to:  master han
 #  Welcome from your feedback:P
 
