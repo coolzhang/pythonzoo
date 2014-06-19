@@ -77,7 +77,6 @@ def cnx_config():
         print
         print "slowlogmgr.py is stopped."
 
-
 def rotate_slowlog():
     try:
         config = cnx_config()
