@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="icon" href="/static/bootstrap-3.3.7-dist/docs/favicon.ico">
+
+    <title>动态登录码生成器</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="/static/bootstrap-3.3.7-dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    <link href="/static/bootstrap-3.3.7-dist/docs/assets/css/ie10-viewport-bug-workaround.css" rel="stylesheet">
+
+    <!-- Custom styles for this template -->
+    <link href="/static/bootstrap-3.3.7-dist/docs/examples/sticky-footer/sticky-footer.css" rel="stylesheet">
+
+    <!-- Just for debugging purposes. Don't actually copy these 2 lines! -->
+    <!--[if lt IE 9]><script src="../../assets/js/ie8-responsive-file-warning.js"></script><![endif]-->
+    <script src="/static/bootstrap-3.3.7-dist/docs/assets/js/ie-emulation-modes-warning.js"></script>
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+	<script src="/static/bootstrap-3.3.7-dist/js/jquery.min.js"></script>
+  </head>
+
+  <body>
+
+    <!-- Begin page content -->
+    <div class="container">
+      <div class="page-header">
+        <h1>动态登录码生成器</h1>
+      </div>
+	  <form class="form-inline">
+	    <div class="form-group">
+	      <div class="input-group">
+			  <input id="code" type="text" class="form-control" value="" placeholder="Get your code...">
+	      </div>
+		</div>
+	    <button id="button" type="button" class="btn btn-primary">生成动态码</button>
+	  </form>
+	  <br>
+      <p>使用动态码登录 <a href="/">数据库SQL审核系统</a> Enjoy YourSQL!</p>
+    </div>
+
+    <footer class="footer">
+      <div class="container">
+		  <p class="text-muted">Sticky footer template for <a href="http://getbootstrap.com/examples/sticky-footer/">Bootstrap</a>.</p>
+      </div>
+    </footer>
+
+	<script>
+		$("#button").on("click",function () {
+			$.ajax({
+				type:"get",
+				url:"/icode",
+				dataType: "json",
+				async:false,
+				success:function(code) {
+					$("#code").val(code)
+				}
+			})
+		});
+	</script>
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    <script src="/static/bootstrap-3.3.7-dist/docs/assets/js/ie10-viewport-bug-workaround.js"></script>
+  </body>
+</html>

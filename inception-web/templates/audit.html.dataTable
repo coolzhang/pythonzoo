@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="/static/js/jquery.min.js"></script>
+    <script src="/static/js/jquery.dataTables.min.js"></script>
+	<link rel="stylesheet" type="text/css" href="/static/css/jquery.dataTables.min.css" />
+	<style>
+		th, tr {
+	    	border: 1px solid black;
+		    border-collapse: collapse;
+	}
+	</style>
+</head>
+<body>
+<h2>数据库SQL审核平台</h2>
+<hr>
+<div>
+	<form action="/sqlaudit" method="post">
+		<label for="dbinfo"> 数据库连接信息：</label>
+		<table>
+			<tr>
+				<td><label for="dbinstance">数据库实例(IP:PORT)</label></td>
+				<td><label for="dbname">数据库名</label></td>
+				<td><label for="operator">执行人</label></td>
+				<td><label for="redmineissue">Redmine工单号</label></td>
+			</tr>
+			<tr>
+				<td><input type="text" id="dbinstance" name="dbinstance" /></td>
+				<td><input type="text" id="dbname" name="dbname" /></td>
+				<td><input type="text" id="operator" name="operator" /></td>
+				<td><input type="text" id="redmineissue" name="redmineissue" /></td>
+			</tr>
+		</table>
+	</form>
+</div>
+<br>
+<div>
+	<label for="auditcontent">SQL语句：</label><br>
+	<label>
+		<textarea name="auditcontent" id="auditcontent" style="width:600px;height:300px;"></textarea>
+	</label>
+	<br>
+	<label>
+		<button type="button" id="button" style="width:60px;height:30px">提交</button>
+	</label>
+</div>
+<br>
+<div>
+	<label for="auditresult">审核结果：</label>
+	<br>
+	<table id="auditresult" class="display" width="100%" style="border: 1px solid black;border-collapse: collapse;background-color: #f1f1c1;font-family: arial, sans-serif;">
+	<!--	<thead>
+			<tr>
+				<th>ID</th>
+				<th>审核状态</th>
+				<th>执行SQL</th>
+				<th>执行时间</th>
+				<th>审核建议</th>
+			</tr>
+		</thead> -->
+	</table>
+
+</div>
+
+<script>
+	function setTableData(data) {
+		$('#auditresult').DataTable({
+			paging: false,
+		    searching: false,
+			destroy: true,
+		    "data": data,
+			"columns": [
+				{ "title": "ID" },
+				{ "title": "StageStatus" },
+				{ "title": "SQL" },
+				{ "title": "ExecuteTime", "class": "center" },
+				{ "title": "ErrorMessage", "class": "center"}
+			]
+		});
+	}
+	setTableData({});
+   $("#button").on("click",function () {
+	var url = window.location.href;
+	var	code = url.split('/').pop();
+	var now = Math.round(new Date().getTime()/1000);
+	var timeout = now - code;
+	if (timeout < 100) {
+		var dbinstance = $("#dbinstance").val();
+		var dbname = $("#dbname").val();
+		var operator = $("#operator").val();
+		var redmineissue = $("#redmineissue").val();
+    	var auditcontent = $("#auditcontent").val();
+		if ( dbinstance && dbname && operator && redmineissue && auditcontent) {
+    		$.ajax({
+    		    type:"post",
+    		    data:{"dbinstance":dbinstance, "dbname":dbname, "operator":operator, "redmineissue":redmineissue, "auditcontent":auditcontent},
+    		    url: "/sqlaudit",
+    		    dataType:"json",
+    		    async:false,
+    		    success:function(result){
+					setTableData(result);
+    		    }
+    		});
+		} else {
+			alert("该页面信息不完整!");
+		}
+	} else {
+		alert("此登陆码已经过期，页面操作无效!");
+		window.location.href='/';
+	};
+	})
+</script>
+</body>
+</html>

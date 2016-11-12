@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="icon" href="/static/bootstrap-3.3.7-dist/docs/favicon.ico">
+
+    <title>MySQL开发规范</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="/static/bootstrap-3.3.7-dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    <link href="/static/bootstrap-3.3.7-dist/docs/assets/css/ie10-viewport-bug-workaround.css" rel="stylesheet">
+
+    <!-- Custom styles for this template -->
+    <link href="/static/bootstrap-3.3.7-dist/docs/examples/sticky-footer/sticky-footer.css" rel="stylesheet">
+
+    <!-- Just for debugging purposes. Don't actually copy these 2 lines! -->
+    <!--[if lt IE 9]><script src="../../assets/js/ie8-responsive-file-warning.js"></script><![endif]-->
+    <script src="/static/bootstrap-3.3.7-dist/docs/assets/js/ie-emulation-modes-warning.js"></script>
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+	<script src="/static/bootstrap-3.3.7-dist/js/jquery.min.js"></script>
+  </head>
+
+  <body>
+
+    <!-- Begin page content -->
+    <div class="container">
+      <div class="page-header">
+        <h1>MySQL开发规范</h1>
+      </div>
+	  <br>
+	  <div class="blog-post">
+	  <blockquote>
+		  <p>说明：此规范为内部制定的一个给开发人员如何使用MySQL的规范，由Team共同讨论制定，还在不断的完善中，有一些建议或者规定不一定十分合理，后续可能会修改。另外，MySQL版本不断进化，也会导致有一些条款失效，请大家根据自身的情况谨慎参考。</p>
+	  </blockquote>
+	  <h3>表设计</h3>
+	  <ol>
+		  <li>库名、表名、字段名、索引名称均使用小写字母，“_”分割。</li>
+		  <li>库名、表名、字段名建议不超过12个字符（库名、表名、字段名支持最多64个字符，但为了统一规范、易于辨识以及减少传输量，统一不超过12字符）。</li>
+		  <li>库名、表名、字段名见名知意，必须添加注释；</li>
+		  <li>无特殊用途，线上使用InnoDB存储引擎。</li>
+		  <li>InnoDB禁止使用外键约束，可以通过程序保证。</li>
+		  <li>存储精确浮点数必须使用DECIMAL替代FLOAT和DOUBLE。</li>
+		  <li>整型定义中无需定义显示宽度，比如：使用INT，而不是INT(4)。</li>
+		  <li>不建议使用ENUM类型（可减少未来的DDL更新），可使用TINYINT来代替。</li>
+		  <li>尽可能不使用TEXT、BLOB类型，如果必须使用，建议将过大字段或是不常用的描述型较大字段拆分到其他表中；另外，禁止用数据库存储图片或文件。</li>
+		  <li>表字符集选择UTF8。</li>
+		  <li>存储年时使用YEAR(4),不使用YEAR(2)。</li>
+		  <li>建议字段定义为NOT NULL。</li>
+		  <li>建议所有表都默认增加两列时间字段，字段定义如下：</li>
+		  <pre><code># 5.6版本之前&#13;&#10;created_time datetime not null comment ‘创建时间’,&#13;&#10;modified_time timestamp not null default current_timestamp on update current_timestamp comment ‘更新时间’&#13;&#10;&#13;&#10;# 5.6版本之后&#13;&#10;created_time datetime not null default current_timestamp comment ‘创建时间’,&#13;&#10;modified_time timestamp not null default current_timestamp on update current_timestamp comment ‘更新时间’</code></pre>
+		  <li>表结构变更需通知DBA审核。</li>
+	 </ol>
+	 <h3>索引选择</h3>
+	 <p>MySQL的查询速度依赖良好的索引设计，因此索引对于高性能至关重要。合理的索引会加快查询速度（包括UPDATE和DELETE的速度，MySQL会将包含该行的page加载到内存中，然后进行UPDATE或者DELETE操作），不合理的索引会降低速度。MySQL索引查找类似于新华字典的拼音和部首查找，当拼音和部首索引不存在时，只能通过一页一页的翻页来查找。当MySQL查询不能使用索引时，MySQL会进行全表扫描，会消耗大量的IO。</p>
+	 <ol>
+		 <li>索引建议命名规则：idx_col1_col2[_colN]、uniq_col1_col2[_colN]（如果字段过长建议采用缩写）。</li>
+		 <li>索引中的字段数建议不超过5个。</li>
+		 <li>单张表的索引个数控制在5个以内。</li>
+		 <li>InnoDB表强烈建议定义主键列，推荐自增ID（尽量与业务无关），如果业务字段有唯一性约束的需求建议选取合适类型单独定义。</li>
+		 <li>建立复合索引时，优先将选择性高的字段放在前面。</li>
+		 <li>UPDATE、DELETE语句需要根据WHERE条件添加索引。</li>
+		 <li>不建议使用%前缀模糊查询，例如：LIKE “%wepiao”，无法用到索引，会导致全表扫描。</li>
+		 <li>合理利用覆盖索引，例如：SELECT email,uid FROM user_email WHERE uid=xx，如果uid不是主键，可以创建覆盖索引idx_uid_email(uid,email)，来提高查询效率。</li>
+		 <li>SQL变更需要通知DBA确认当前索引是否也需同步更新。</li>
+	</ol>
+	<h3>SQL语句</h3>
+	<ol>
+		<li>使用prepared statement，可以提供性能并且避免SQL注入。</li>
+		<li>SQL语句中IN包含的值不应过多。</li>
+		<li>UPDATE、DELETE语句一定要有明确的WHERE条件。</li>
+		<li>WHERE条件中的字段值需要符合该字段的数据类型，避免MySQL进行隐式类型转化。</li>
+		<li>SELECT、INSERT语句必须显式的指明字段名称，禁止使用SELECT * 或是INSERT INTO table_name values()。</li>
+		<li>INSERT语句使用batch提交（INSERT INTO table_name VALUES(),(),()……），values的个数不应过多。</li>
+		<li>避免使用存储过程、触发器、自定义函数等，容易将业务逻辑和DB耦合在一起。</li>
+		<li>避免在索引字段上使用函数，否则会导致查询时索引失效。</li>
+		<li>考虑使用UNION ALL,减少使用UNION,因为UNION ALL不去重，而少了排序操作，速度相对比UNION要快，如果没有去重的需求，优先使用UNION ALL。</li>
+		<li>考虑使用limit N，少用limit M,N，特别是大表，或M比较大的时候。</li>
+		<li>减少或避免排序，如：group by语句中如果不需要排序，可以增加order by null。</li>
+		<li>统计表中记录数时使用COUNT(*)，而不是COUNT(primary_key)和COUNT(1)；InnoDB表避免使用COUNT(*)操作，计数统计实时要求较强可以使用memcache或者redis，非实时统计可以使用单独统计表，定时更新。</li>
+		<li>做字段变更操作(modify column/change column)的时候必须加上原有的的注释属性，否则修改后，注释会丢失。</li>
+	</ol>
+	<h3>分表设计</h3>
+	<ol>
+		<li>对于字段类型简单，字段数不多表，单表数据量建议控制在5000w以下。</li>
+		<li>可以结合使用hash、range、lookup table进行分表。</li>
+		<li>分表如果使用MD5（或者类似的HASH算法）进行分表，表名后缀使用16进制，比如user_ff。</li>
+		<li>推荐使用CRC32求余（或者类似的算术算法）进行分表，表名后缀使用数字，数字必须从0开始并等宽，比如散64张表，后缀从00-63。</li>
+		<li>使用时间分表，表名后缀必须使用特定格式，比如：按日分表user_20110209、按月分表user_201102。</li>
+	</ol>
+	<h3>必要文档</h3>
+	<ol>
+		<li>非功能性需求，比如：性能需求、可扩展性需求、数据需求。</li>
+		<li>数据库访问层实现说明(关注分库和分表方法，缓存机制，读写分离等)。</li>
+		<li>提供ER图。</li>
+		<li>提供数据字典。</li>
+		<li>按表或按功能页面来分类提供常用SQL语句列表。</li>
+	</ol>
+	<h3>其他悉知</h3>
+	<ol>
+		<li>批量导入、导出数据需要DBA进行审查，并在执行过程中观察服务。</li>
+		<li>批量更新数据，如：UPDATE,DELETE操作，需要DBA进行审查，并在执行过程中观察服务。</li>
+		<li>产品出现非数据库平台运维导致的问题和故障时，如前端被抓站，请及时通知DBA，便于维护服务稳定。</li>
+		<li>业务部门程序出现bug等影响数据库服务的问题,请及时通知DBA，便于维护服务稳定。</li>
+		<li>业务部门推广活动，请提前通知DBA进行服务和访问评估。</li>
+		<li>如果出现业务部门人为误操作导致数据丢失，需要恢复数据，请在第一时间通知DBA，并提供准确时间，误操作语句等重要线索。</li>
+		<li>常用字段类型参考，如下：</li>
+		</ol>
+		<form class="from-group">
+		<table class="table table-striped table-bordered">
+			<thead>
+				<tr>
+					<th>字段类型</th>
+					<th>字段范围</th>
+					<th>存储大小</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td align="left">INT[(M)] [UNSIGNED] [ZEROFILL]</td>
+					<td align="left">-2147483648到2147483647 或 0到4294967295</td>
+					<td align="left">4个字节</td>
+				</tr>
+				<tr>
+					<td align="left">DECIMAL[(M[,D])] [UNSIGNED] [ZEROFILL]</td>
+					<td align="left">整数最大位数（M）为65，小数位数最大（D）为30</td>
+					<td align="left">变长</td>
+				</tr>
+				<tr>
+					<td align="left">FLOAT(M,D)</td>
+					<td align="left">M:0-23</td>
+					<td align="left">4个字节</td>
+				</tr>
+				<tr>
+					<td align="left">DATETIME</td>
+					<td align="left">YYYY-MM-DD HH:MM:SS(1001年到9999年的范围) </td>
+					<td align="left">8个字节</td>
+				</tr>
+				<tr>
+					<td align="left">TIMESTAMP</td>
+					<td align="left">YYYY-MM-DD HH:MM:SS（1970年到2037年的范围）</td>
+					<td align="left">4个字节</td>
+				</tr>
+				<tr>
+					<td align="left">CHAR(M)</td>
+					<td align="left">M:0-255</td>
+					<td align="left">所占空间跟字符集等有关系</td>
+				</tr>
+				<tr>
+					<td align="left">VARCHAR(M)</td>
+					<td align="left">M:0-65535</td>
+					<td align="left">所占空间跟字符集等有关系</td>
+				</tr>
+				<tr>
+					<td align="left">TEXT</td>
+					<td align="left">64K个字符</td>
+					<td align="left">所占空间跟字符集等有关系</td>
+				</tr>
+			</tbody>
+		</table>
+		</form>
+		<p>详见手册：<a href="http://dev.mysql.com/doc/refman/5.7/en/storage-requirements.html">12.8 Data Type Storage Requirements</a></p>
+		<hr>
+     <p>欢迎访问 <a href="/">数据库SQL审核系统</a> Enjoy YourSQL!</p>
+	 </div>
+    </div>
+
+    <footer class="footer">
+      <div class="container">
+		  <p class="text-muted">Sticky footer template for <a href="http://getbootstrap.com/examples/sticky-footer/">Bootstrap</a>.</p>
+      </div>
+    </footer>
+
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    <script src="/static/bootstrap-3.3.7-dist/docs/assets/js/ie10-viewport-bug-workaround.js"></script>
+  </body>
+</html>
