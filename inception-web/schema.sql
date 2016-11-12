@@ -1,3 +1,5 @@
+create database if not exists sqlaudit;
+
 use sqlaudit;
 drop table if exists inception_log;
 create table inception_log (
