@@ -40,5 +40,4 @@ Goto icoder page to get a dynamic code.
     # http://127.0.0.1:5000/icoder  
 Enter your code on home page to login the **SQL Audit PLatform**. And then enjoy your SQL! So easy:P 
 
- *<mark>Note:</mark> each code will expire in 3600 seconds.
-
+ *<mark>Note:</mark> each code will expire in 3600 seconds, which can be set by the code_timeout variable of the inception-web group in inception-web.conf. 
