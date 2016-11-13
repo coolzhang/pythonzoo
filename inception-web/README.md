@@ -1,6 +1,6 @@
 # Inception-web  
 
-It's the [Inception](http://mysql-inception.github.io/inception-document/) based MySQL SQL audit platform by Python.
+It's the [Inception](http://mysql-inception.github.io/inception-document/) based **MySQL SQL Audit Platform** by Python.
 
 ### Architecture  
    
@@ -29,16 +29,16 @@ It's the [Inception](http://mysql-inception.github.io/inception-document/) based
      +--------------------+  
   
 ### Usage  
-Start inception-web  
+Start inception-web.  
 
     # python ./inception-web.py  
-Goto home page  
+Goto home page.  
 
     # http://127.0.0.1:5000  
-Goto icoder page to get a dynamic code  
+Goto icoder page to get a dynamic code.  
 
     # http://127.0.0.1:5000/icoder  
-Enter your codge on home page to login the **SQL Audit PLatform**. And then enjoy your SQL! So easy:P 
+Enter your code on home page to login the **SQL Audit PLatform**. And then enjoy your SQL! So easy:P 
 
-Note: each code will expire in 3600 seconds.
+ *<mark>Note:</mark> each code will expire in 3600 seconds.
 
