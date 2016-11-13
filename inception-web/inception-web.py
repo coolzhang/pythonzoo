@@ -14,7 +14,7 @@ config.read('inception-web.conf')
 app = Flask(__name__)
 
 @app.route('/', methods=["get"])
-def inception_main():
+def inception_home():
 	return render_template("index.html")
 
 @app.route('/login', methods=["post","get"])
@@ -25,10 +25,10 @@ def inception_login():
 	code = request.values.get("dyncode","")
 	if code:
 		sql = "select code from dyncode where code=%d" % int(code)
-		res = sqlaudit_query(sql, "select")
+		code_exist = sqlaudit_query(sql, "select")
 		now = int(time.time())
-		timeout = now - int(code)
-		if res and timeout < 100:
+		code_timeout = now - int(code)
+		if code_exist and code_timeout < int(config.get("inception-web","code-timeout")):
 			return redirect(url_for('inception_web', icode=code))
 		else:
 			return render_template("index.html", errmsg=u"此动态验证码无效!")
@@ -42,8 +42,8 @@ def inception_web(icode):
 def inception_audit():
 	code = int(request.headers["Referer"].split('/')[-1])
 	now = int(time.time())
-	timeout = now - code
-	if timeout < 3600:
+	code_timeout = now - code
+	if code_timeout < int(config.get("inception-web","code-timeout")):
 		online = {
 			"user": "root",
 			"password": "",
@@ -131,7 +131,6 @@ def code():
 	sql = "insert into dyncode(code) values(%d);" % code
 	sqlaudit_query(sql, "insert")
 	return jsonify(code)
-
 
 if __name__ == '__main__':
 	app.run('0.0.0.0',debug=True)
