@@ -2,33 +2,33 @@
 
 It's the [Inception](http://mysql-inception.github.io/inception-document/) based MySQL SQL audit platform by Python.
 
-## Architecture  
-
-   [Get dynamic code] via icoder tool
-            || login
-  +------------------+
-  |                  |
-  |  Inception-web   |(Flask webserver:5000)
-  |                  |
-  +------------------+
-            |
-            |
-            v
- +--------------------+
- |                    |
- |  Inception-server  |(Inception proxyserver:33066)
- |                    |
- +--------------------+
-            |
-            |
-            v
- +--------------------+
- |                    |
- |   MySQL Instance   |(Your dbserver:3306)
- |                    |
- +--------------------+
-
-## Usage  
+### Architecture  
+   
+   [Get dynamic code] via icoder tool  
+            || login  
+  +------------------+  
+  |                  |  
+  |  Inception-web   |(Flask webserver:5000)  
+  |                  |  
+  +------------------+  
+            |  
+            |  
+            v  
+ +--------------------+  
+ |                    |  
+ |  Inception-server  |(Inception proxyserver:33066)  
+ |                    |  
+ +--------------------+  
+            |  
+            |  
+            v  
+ +--------------------+  
+ |                    |  
+ |   MySQL Instance   |(Your dbserver:3306)  
+ |                    |  
+ +--------------------+  
+  
+### Usage  
 Start inception-web  
    # python ./inception-web.py  
 Goto home page  
