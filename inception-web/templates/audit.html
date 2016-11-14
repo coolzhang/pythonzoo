@@ -2,6 +2,8 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+	<link rel="icon" href="/static/bootstrap-3.3.7-dist/docs/favicon.ico">
+
     <title>基于Inception的SQL审核平台</title>
 	<!-- Bootstrap core CSS -->
 	<link href="/static/bootstrap-3.3.7-dist/css/bootstrap.min.css" rel="stylesheet">
@@ -125,18 +127,23 @@
 		var redmineissue = $("#redmineissue").val();
     	var auditcontent = $("#auditcontent").val();
 		if ( dbinstance && dbname && operator && redmineissue && auditcontent) {
-    		$.ajax({
-    		    type:"post",
-    		    data:{"dbinstance":dbinstance, "dbname":dbname, "operator":operator, "redmineissue":redmineissue, "auditcontent":auditcontent},
-    		    url: "/sqlaudit",
-    		    dataType:"json",
-    		    async:false,
-    		    success:function(result){
-					if (result) {
-						$("#auditresult").html(setTableData(result));
-					}
-    		    }
-    		});
+			var unsafesql = (/alter\s+table\s+\w+\s+(modify|drop|change)\s+.*;\s*/im).test(auditcontent);
+			if (!unsafesql) {
+    			$.ajax({
+    			    type:"post",
+    			    data:{"dbinstance":dbinstance, "dbname":dbname, "operator":operator, "redmineissue":redmineissue, "auditcontent":auditcontent},
+    			    url: "/sqlaudit",
+    			    dataType:"json",
+    			    async:false,
+    			    success:function(result){
+						if (result) {
+							$("#auditresult").html(setTableData(result));
+						}
+    			    }
+    			});
+			} else {
+				alert("该平台禁止执行此类危险操作(modify|change|drop)，请联系DBA协助完成!");
+			}
 		} else {
 			alert("该页面信息不完整!");
 		}
