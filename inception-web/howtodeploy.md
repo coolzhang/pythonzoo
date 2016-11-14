@@ -1,13 +1,13 @@
-## To deploy **Inception-web** via [Gunicorn](http://gunicorn.org/) and [Nginx](http://nginx.org/) in Linux as follow.  
-  
-###  
+## To deploy **Inception-web** via [Gunicorn](http://gunicorn.org/) and [Nginx](http://nginx.org/) in Linux as follow:  
+
+###   
 
 Install Gunicorn.  
+
     # pip install gunicorn  
+Install Nginx.   
 
-Install Nginx.  
     # yum install nginx  
-
 Configuring Nginx to Proxy Requests.  
     # vim /etc/nginx/nginx.conf  
 
@@ -31,6 +31,6 @@ Configuring Nginx to Proxy Requests.
         }  
 
 Start Gunicorn and Nginx.  
+ 
     # service nginx start  
     # gunicorn --daemon --workers 16 127.0.0.1:5000 inception-web:app  
-
