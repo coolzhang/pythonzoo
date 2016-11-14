@@ -1,4 +1,6 @@
-# To deploy **Inception-web** via [Gunicorn](http://gunicorn.org/) and [Nginx](http://nginx.org/) in Linux as follow.  
+## To deploy **Inception-web** via [Gunicorn](http://gunicorn.org/) and [Nginx](http://nginx.org/) in Linux as follow.  
+  
+###  
 
 Install Gunicorn.  
     # pip install gunicorn  
