@@ -99,6 +99,15 @@
 </div>
 
 <script>
+	$("#dbinstance").blur(function() {
+		var dbinstance = $("#dbinstance").val();
+		var exist = dbinstance.match(/:/);
+		if (!exist && dbinstance) {
+			alert("输入格式不正确!");
+			$("#dbinstance").val('')
+			$("#dbinstance").focus()
+		}
+	});
 	function setTableData(data) {
 		var info_html = "<tr><th>ID</th> <th>审核状态</th> <th>执行SQL</th> <th>执行时间</th> <th>审核建议</th></tr>";
 		$.each(data, function(index, element) {
@@ -138,6 +147,8 @@
     			    success:function(result){
 						if (result) {
 							$("#auditresult").html(setTableData(result));
+						} else {
+							alert("Inception Server出问题了，请联系DBA!")
 						}
     			    }
     			});
