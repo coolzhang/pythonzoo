@@ -29,6 +29,11 @@ It's the [Inception](http://mysql-inception.github.io/inception-document/) based
      +--------------------+  
   
 ### Usage  
+Prerequisites  
+
+    # pip install flask gunicorn  
+    # yum install nginx 
+    # bin/Inception --defaults-file=bin/inc.conf   
 Start inception-web.  
 
     # python ./inception-web.py  
