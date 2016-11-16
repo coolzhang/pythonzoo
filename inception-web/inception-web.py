@@ -66,7 +66,7 @@ def inception_audit():
 	code_timeout = now - code
 	if code_timeout < config.getint('inception-web','code-timeout'):
 		online = {
-			"user": "root",
+			"user": "inception",
 			"password": "",
 			"instance": request.values.get("dbinstance",""),
 			"db": request.values.get("dbname",""),
@@ -82,7 +82,7 @@ def inception_audit():
 			"port": int(config.get("inception-server","port")),
 			"charset": config.get("inception-server","charset")
 		}
-		idsn = '/*--user=' + online['user'] + ';--password=' + online['password'] + ';--host=' + online['instance'].split(':')[0] + ';--execute=1;--port=' + online['instance'].split(':')[1] + ';*/'
+		idsn = '/*--user=' + online['user'] + ';--password=' + online['password'] + ';--host=' + online['instance'].split(':')[0] + ';--execute=1;--remote-backup=0;--port=' + online['instance'].split(':')[1] + ';*/'
 		istart = 'inception_magic_start;'
 		icommit = 'inception_magic_commit;'
 		isql = idsn + istart + online['sql'] + icommit
