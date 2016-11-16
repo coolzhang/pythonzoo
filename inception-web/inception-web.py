@@ -8,6 +8,8 @@ import json
 import time
 import ConfigParser
 import os
+import logging
+from logging.handlers import RotatingFileHandler
 
 config = ConfigParser.SafeConfigParser()
 
@@ -163,4 +165,10 @@ def code():
 	return jsonify(code)
 
 if __name__ == '__main__':
+	formatter = logging.Formatter(fmt='%(asctime)s [%(levelname)s] %(message)s',datefmt='%Y-%m-%d %H:%M:%S')
+	handler = RotatingFileHandler('./inception.log', maxBytes=262144, backupCount=2)
+	handler.setFormatter(formatter)
+	handler.setLevel(logging.INFO)
+	app.logger.addHandler(handler)
+
 	app.run('0.0.0.0',debug=True)
