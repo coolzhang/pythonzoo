@@ -114,10 +114,15 @@
 			var trs = "";
 			if (element[1] == "Execute Successfully") {
 				element[1] = "执行成功"
-			} else if (element[1] == "Audit completed") {
+			} else {
 				element[1] = "审核未通过"
 			};
-			trs += "<tr><td align='left'>" + element[0] + "</td> <td align='left'>" + element[1] + "</td> <td align='left'>" + element[2] + "</td> <td align='left'>" + element[3] + "</td> <td align='left'>" + element[4] + "</td></tr>";
+			var e4 = element[4].split('.');
+			var element4 = "";
+			$.each(e4, function(index, element) { 
+				element4 = element4 + "<p>" + element + "</p>"
+			});
+		trs += "<tr><td align='left'>" + element[0] + "</td> <td align='left'>" + element[1] + "</td> <td align='left'>" + element[2] + "</td> <td align='left'>" + element[3] + "</td> <td align='left'>" + "<div>" + element4 + "</div>" + "</td></tr>";
 			info_html += trs;
 		});
 
