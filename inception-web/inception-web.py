@@ -69,7 +69,7 @@ def inception_audit():
 	if code_timeout < config.getint('inception-web','code-timeout'):
 		online = {
 			"user": "inception",
-			"password": "",
+			"password": "JvnX9qc2NvkuHdxwUxvxIMN5C",
 			"instance": request.values.get("dbinstance",""),
 			"db": request.values.get("dbname",""),
 			"sql": request.values.get("auditcontent",""),
@@ -106,7 +106,7 @@ def inception_audit():
 				else:
 					r_sql = row[5]
 				r_exetime = row[9]
-				r_err = row[4].replace('\n',' ')
+				r_err = row[4].replace('\n',';')
 				audit_result.append([r_id, r_stagestatus, r_sql, r_exetime, r_err])
 				errlevels.append(r_errlevel)
 				if r_errlevel != 0:
