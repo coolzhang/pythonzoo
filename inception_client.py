@@ -26,8 +26,8 @@ istart = "inception_magic_start;"
 icommit = "inception_magic_commit;"
 inception_config = {
 	"host": "127.0.0.1",
-	"user": "root",
-	"passwrd": "",
+	"user": "",
+	"passwd": "",
 	"db": "",
 	"port": 33066,
 	"charset": "utf8"
