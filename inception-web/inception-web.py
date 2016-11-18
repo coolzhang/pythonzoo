@@ -12,7 +12,6 @@ import logging
 from logging.handlers import RotatingFileHandler
 
 config = ConfigParser.SafeConfigParser()
-
 if not os.path.exists('./inception-web.conf'):
 	config.add_section('inception-server')
 	config.set('inception-server','user','root')
@@ -28,14 +27,11 @@ if not os.path.exists('./inception-web.conf'):
 	config.set('inception-web','db','test')
 	config.set('inception-web','charsetr','utf8')
 	config.set('inception-web','code-timeout','3600')
-
 	with open('./inception-web.conf', 'wb') as configfile:
 		config.write(configfile)
-
 config.read('./inception-web.conf')
 
 app = Flask(__name__)
-
 @app.route('/', methods=['get'])
 def inception_home():
 	return render_template('index.html')
@@ -71,7 +67,7 @@ def inception_audit():
 			"user": "inception",
 			"password": "",
 			"instance": request.values.get("dbinstance",""),
-			"db": request.values.get("dbname",""),
+			"database": request.values.get("dbname",""),
 			"sql": request.values.get("auditcontent",""),
 			"operator": request.values.get("operator",""),
 			"redmineissue": int(request.values.get("redmineissue",""))
@@ -93,11 +89,10 @@ def inception_audit():
 			iconn = MySQLdb.connect(**inception_server)
 			icur = iconn.cursor()
 			iquery = icur.execute(isql)
-			ioutput = icur.fetchall()
-
+			irows = icur.fetchall()
 			audit_result = []
 			errlevels = []
-			for row in ioutput:
+			for row in irows:
 				r_id = row[0]
 				r_errlevel = row[2]
 				r_stagestatus = row[3]
@@ -113,16 +108,17 @@ def inception_audit():
 					sql = 'insert into operator_log(operator,redmineissue,errlevel,errmsg) values("%s",%d,%d,"%s");' %(online['operator'], online['redmineissue'], r_errlevel, r_err)
 					sqlaudit_query(sql, 'insert')
 			icur.close()
-			iconn.close()
 
 			if sum(errlevels) == 0:
-				sql = 'insert into inception_log(dbinstance,dbname,ioutput) values("%s","%s","%s");' %(online["instance"], online["db"], audit_result)
+				sql = 'insert into inception_log(dbinstance,dbname,ioutput) values("%s","%s","%s");' %(online["instance"], online["database"], audit_result)
 				sqlaudit_query(sql, 'insert')
 			return jsonify(audit_result)
-
 		except MySQLdb.Error, err:
-			app.logger.error('Inception-server DBconnect Error %d: %s', err.args[0], err.args[1])
+			app.logger.error('Inception-server DBconnect Error: %s', err)
 			return jsonify('')
+		else:
+			iconn.close()
+
 
 def sqlaudit_query(sql, sqltype):
 	inception_web = {
@@ -136,18 +132,18 @@ def sqlaudit_query(sql, sqltype):
 
 	try:
 		conn = MySQLdb.connect(**inception_web)
-		cur = conn.cursor()
-		query = cur.execute(sql)
+		cursor = conn.cursor()
+		query = cursor.execute(sql)
 		if sqltype == 'select':
-			result = cur.fetchone()
-			if result:
-				return result[0]
+			row = cursor.fetchone()
+			if row:
+				return row[0]
 		conn.commit()
-		cur.close()
-		conn.close()
-
+		cursor.close()
 	except MySQLdb.Error, err:
-		app.logger.error('Inception-web DBconnect Error %d: %s', err.args[0], err.args[1])
+		app.logger.error('Inception-web DBconnect Error: %s', err)
+	else:
+		conn.close()
 
 @app.route('/sqlguide', methods=['get'])
 def sqlguide():
