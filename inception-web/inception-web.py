@@ -65,7 +65,7 @@ def inception_audit():
 	if code_timeout < config.getint('inception-web','code-timeout'):
 		online = {
 			"user": "inception",
-			"password": "",
+			"password": "JvnX9qc2NvkuHdxwUxvxIMN5C",
 			"instance": request.values.get("dbinstance",""),
 			"database": request.values.get("dbname",""),
 			"sql": request.values.get("auditcontent",""),
@@ -149,7 +149,7 @@ def sqlaudit_query(sql, sqltype):
 def sqlguide():
 	return render_template('sqlguide.html')
 
-@app.route('/icoder', methods=['get'])
+@app.route('/inception-auth', methods=['get'])
 def coder():
 	return render_template('coder.html')
 
