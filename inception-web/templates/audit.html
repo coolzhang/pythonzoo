@@ -114,14 +114,19 @@
 			var trs = "";
 			if (element[1] == "Execute Successfully") {
 				element[1] = "执行成功"
-			} else {
-				element[1] = "审核未通过"
+			} else if (element[1] == "Execute failed") {
+				element[1] = "执行失败"
 			};
 			var e4 = element[4].split(';');
 			var element4 = "";
-			$.each(e4, function(index, element) { 
+			$.each(e4, function(index, value) { 
 				if (element) {
-					element4 = element4 + "<p>" + element + "</p>"
+					if (element[1] == "Audit completed" && value != "None") {
+						element[1] = "审核未通过"
+					} else if (element[1] == "Audit completed" && value == "None" ) {
+						element[1] = "审核通过"
+					};
+					element4 = element4 + "<p>" + value + "</p>"
 				}
 			});
 			trs += "<tr><td align='left'>" + element[0] + "</td> <td align='left'>" + element[1] + "</td> <td align='left'>" + element[2] + "</td> <td align='left'>" + element[3] + "</td> <td align='left'>" + "<div>" + element4 + "</div>" + "</td></tr>";
