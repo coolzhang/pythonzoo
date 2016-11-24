@@ -65,12 +65,12 @@ def inception_audit():
 	if code_timeout < config.getint('inception-web','code-timeout'):
 		online = {
 			"user": "inception",
-			"password": "JvnX9qc2NvkuHdxwUxvxIMN5C",
+			"password": "",
 			"instance": request.values.get("dbinstance",""),
 			"database": request.values.get("dbname",""),
 			"sql": request.values.get("auditcontent",""),
 			"operator": request.values.get("operator",""),
-			"redmineissue": int(request.values.get("redmineissue",""))
+			"redmineissue": request.values.get("redmineissue","")
 		}
 		inception_server = {
 			"host": config.get("inception-server","host"),
@@ -167,4 +167,4 @@ if __name__ == '__main__':
 	handler.setLevel(logging.INFO)
 	app.logger.addHandler(handler)
 
-	app.run('0.0.0.0',debug=True)
+	app.run('127.0.0.1',debug=True)
