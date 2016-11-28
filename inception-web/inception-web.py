@@ -43,15 +43,22 @@ def inception_login():
 
 	code = request.values.get('dyncode','')
 	if code:
-		sql = 'select code from dyncode where code=%d' % int(code)
-		code_exist = sqlaudit_query(sql, 'select')
-		now = int(time.time())
-		code_timeout = now - int(code)
-		if code_exist and code_timeout < config.getint('inception-web','code-timeout'):
-			return redirect(url_for('inception_web', icode=code))
+		if code.isdigit():
+			sql = 'select code from dyncode where code=%d' % int(code)
+			code_exist = sqlaudit_query(sql, 'select')
+			now = int(time.time())
+			code_timeout = now - int(code)
+			if code_exist:
+				if code_timeout < config.getint('inception-web','code-timeout'):
+					return redirect(url_for('inception_web', icode=code))
+				else:
+					return render_template('index.html', errmsg=u'此动态验证码已过期，请联系DBA!')
+			else:
+				return render_template('index.html', errmsg=u'此动态验证码无效，不要尝试破解哦!')
 		else:
-			return render_template('index.html', errmsg=u'此动态验证码无效!')
-	return render_template('index.html', errmsg=u'请先输入动态验证码!')
+			return render_template('index.html', errmsg=u'此动态验证码不合法!')
+	else:
+		return render_template('index.html', errmsg=u'请先输入动态验证码!')
 
 @app.route('/inception/<icode>',methods=['get'])
 def inception_web(icode):
@@ -65,7 +72,7 @@ def inception_audit():
 	if code_timeout < config.getint('inception-web','code-timeout'):
 		online = {
 			"user": "inception",
-			"password": "",
+			"password": "JvnX9qc2NvkuHdxwUxvxIMN5C",
 			"instance": request.values.get("dbinstance",""),
 			"database": request.values.get("dbname",""),
 			"sql": request.values.get("auditcontent",""),
@@ -105,7 +112,7 @@ def inception_audit():
 				audit_result.append([r_id, r_stagestatus, r_sql, r_exetime, r_err])
 				errlevels.append(r_errlevel)
 				if r_errlevel != 0:
-					sql = 'insert into operator_log(operator,redmineissue,errlevel,errmsg) values("%s",%d,%d,"%s");' %(online['operator'], online['redmineissue'], r_errlevel, r_err)
+					sql = 'insert into operator_log(operator,redmineissue,errlevel,errmsg) values("%s",%s,%d,"%s");' %(online['operator'], online['redmineissue'], r_errlevel, r_err)
 					sqlaudit_query(sql, 'insert')
 			icur.close()
 
@@ -161,10 +168,10 @@ def code():
 	return jsonify(code)
 
 if __name__ == '__main__':
-	formatter = logging.Formatter(fmt='%(asctime)s [%(levelname)s] %(message)s',datefmt='%Y-%m-%d %H:%M:%S')
+	formatter = logging.Formatter(fmt='%(asctime)s - %(levelname)s - %(message)s',datefmt='%Y-%m-%d %H:%M:%S')
 	handler = RotatingFileHandler('./inception.log', maxBytes=262144, backupCount=2)
 	handler.setFormatter(formatter)
 	handler.setLevel(logging.INFO)
 	app.logger.addHandler(handler)
 
-	app.run('127.0.0.1',debug=True)
+	app.run('0.0.0.0',debug=True)
