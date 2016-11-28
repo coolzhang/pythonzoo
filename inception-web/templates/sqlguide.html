@@ -57,7 +57,7 @@
 		  <li>尽可能不使用TEXT、BLOB类型，如果必须使用，建议将过大字段或是不常用的描述型较大字段拆分到其他表中；另外，禁止用数据库存储图片或文件。</li>
 		  <li>表字符集选择UTF8。</li>
 		  <li>存储年时使用YEAR(4),不使用YEAR(2)。</li>
-		  <li>建议字段定义为NOT NULL。</li>
+		  <li>建议字段定义为NOT NULL，如果业务字段存在空值情况，建议默认值定义如下，整型默认值为：0，字符串默认值为：''。</li>
 		  <li>建议所有表都默认增加两列时间字段，字段定义如下：</li>
 		  <pre><code># 5.6版本之前&#13;&#10;created_time datetime not null comment ‘创建时间’,&#13;&#10;modified_time timestamp not null default current_timestamp on update current_timestamp comment ‘更新时间’&#13;&#10;&#13;&#10;# 5.6版本之后&#13;&#10;created_time datetime not null default current_timestamp comment ‘创建时间’,&#13;&#10;modified_time timestamp not null default current_timestamp on update current_timestamp comment ‘更新时间’</code></pre>
 		  <li>表结构变更需通知DBA审核。</li>
