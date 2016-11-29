@@ -77,8 +77,15 @@ def inception_audit():
 			"database": request.values.get("dbname",""),
 			"sql": request.values.get("auditcontent",""),
 			"operator": request.values.get("operator",""),
-			"redmineissue": request.values.get("redmineissue","")
+			"redmineissue": request.values.get("redmineissue",""),
+			"connect_timeout": 3
 		}
+		try:
+			conn = MySQLdb.connect(user=online['user'], passwd=online['password'], host=online['instance'].split(':')[0], port=int(online['instance'].split(':')[1]), db=online['database'], connect_timeout=online['connect_timeout'], charset='utf8')
+		except MySQLdb.Error, err:
+			app.logger.error('MySQL Server DBconnect Error %d: %s', err[0],err[1])
+			return jsonify('mysql') 
+
 		inception_server = {
 			"host": config.get("inception-server","host"),
 			"user": config.get("inception-server","user"),
@@ -122,7 +129,7 @@ def inception_audit():
 			return jsonify(audit_result)
 		except MySQLdb.Error, err:
 			app.logger.error('Inception-server DBconnect Error: %s', err)
-			return jsonify('')
+			return jsonify('inception')
 		else:
 			iconn.close()
 
@@ -171,7 +178,7 @@ if __name__ == '__main__':
 	formatter = logging.Formatter(fmt='%(asctime)s - %(levelname)s - %(message)s',datefmt='%Y-%m-%d %H:%M:%S')
 	handler = RotatingFileHandler('./inception.log', maxBytes=262144, backupCount=2)
 	handler.setFormatter(formatter)
-	handler.setLevel(logging.INFO)
+	handler.setLevel(logging.ERROR)
 	app.logger.addHandler(handler)
 
 	app.run('0.0.0.0',debug=True)
