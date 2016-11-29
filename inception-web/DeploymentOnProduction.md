@@ -22,5 +22,6 @@ Configuring Nginx to Proxy Requests.
 
 Start Nginx and Gunicorn.  
  
-    # service nginx start  
+    # service nginx start 
+	# cd /PATH_TO/inception-web   
     # gunicorn --daemon --workers 16 --bind 127.0.0.1:5000 --log-file /tmp/gunicorn.log inception-web:app  
