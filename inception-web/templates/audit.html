@@ -100,7 +100,7 @@
 
 <script>
 	$("#dbinstance").blur(function() {
-		var dbinstance = $("#dbinstance").val();
+		var dbinstance = $("#dbinstance").val().trim();
 		var exist = dbinstance.match(/:/);
 		if (!exist && dbinstance) {
 			alert("输入格式不正确!");
@@ -143,11 +143,11 @@
 	var now = Math.round(new Date().getTime()/1000);
 	var timeout = now - code;
 	if (timeout < 3600) {
-		var dbinstance = $("#dbinstance").val();
-		var dbname = $("#dbname").val();
-		var operator = $("#operator").val();
-		var redmineissue = $("#redmineissue").val();
-    	var auditcontent = $("#auditcontent").val();
+		var dbinstance = $("#dbinstance").val().trim();
+		var dbname = $("#dbname").val().trim();
+		var operator = $("#operator").val().trim();
+		var redmineissue = $("#redmineissue").val().trim();
+    	var auditcontent = $("#auditcontent").val().trim();
 		if ( dbinstance && dbname && operator && redmineissue && auditcontent) {
 			var unsafesql = (/alter\s+table\s+\w+\s+(modify|drop|change)\s+.*;\s*/im).test(auditcontent);
 			if (!unsafesql) {
@@ -159,12 +159,14 @@
     			    async:false,
     			    success:function(result){
 						$("#button").val('提交审核').attr('disabled',false);
-						if (result) {
-							$("#auditresult").html(setTableData(result));
+						if (result == "inception") {
+							alert("Inception Server出问题了，请联系DBA!");
+						} else if (result == "mysql") {
+							alert("请确认IP、端口以及库名是否匹配");
 						} else {
-							alert("Inception Server出问题了，请联系DBA!")
+							$("#auditresult").html(setTableData(result));
 						}
-    			    }
+					}
     			});
 			} else {
 				$("#button").val('提交审核').attr('disabled',false);
