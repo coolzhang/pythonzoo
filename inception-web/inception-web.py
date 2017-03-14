@@ -72,7 +72,7 @@ def inception_audit():
 	if code_timeout < config.getint('inception-web','code-timeout'):
 		online = {
 			"user": "inception",
-			"password": "JvnX9qc2NvkuHdxwUxvxIMN5C",
+			"password": "pass4mysql",
 			"instance": request.values.get("dbinstance",""),
 			"database": request.values.get("dbname",""),
 			"sql": request.values.get("auditcontent",""),
