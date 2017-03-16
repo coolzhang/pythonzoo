@@ -137,7 +137,8 @@
 	};
 
    $("#button").on("click",function () {
-	$("#button").val('Please waiting...').attr('disabled',true);
+	$(this).val("Please waiting...");
+	$(this).prop('disabled',true);
 	var url = window.location.href;
 	var	code = url.split('/').pop();
 	var now = Math.round(new Date().getTime()/1000);
@@ -156,9 +157,8 @@
     			    data:{"dbinstance":dbinstance, "dbname":dbname, "operator":operator, "redmineissue":redmineissue, "auditcontent":auditcontent},
     			    url: "/sqlaudit",
     			    dataType:"json",
-    			    async:false,
+    			    //async:false,
     			    success:function(result){
-						$("#button").val('提交审核').attr('disabled',false);
 						if (result == "inception") {
 							alert("Inception Server出问题了，请联系DBA!");
 						} else if (result == "mysql") {
@@ -166,18 +166,21 @@
 						} else {
 							$("#auditresult").html(setTableData(result));
 						}
+	                    $(this).val("提交审核");
+			            $(this).prop('disabled',false);
 					}
     			});
 			} else {
-				$("#button").val('提交审核').attr('disabled',false);
 				alert("该平台禁止执行此类危险操作(modify|change|drop)，请联系DBA协助完成!");
+	            $(this).val("提交审核");
+	            $(this).prop('disabled',false);
 			}
 		} else {
-			$("#button").val('提交审核').attr('disabled',false);
 			alert("该页面信息不完整!");
+	        $(this).val("提交审核");
+	        $(this).prop('disabled',false);
 		}
 	} else {
-		$("#button").val('提交审核').attr('disabled',false);
 		alert("此登陆码已过期，页面操作无效!");
 		window.location.href='/';
 	}
