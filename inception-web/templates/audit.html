@@ -166,19 +166,19 @@
 						} else {
 							$("#auditresult").html(setTableData(result));
 						}
-	                    $(this).val("提交审核");
-			            $(this).prop('disabled',false);
+						$("#button").val("提交审核");
+						$("#button").prop('disabled',false);
 					}
     			});
 			} else {
 				alert("该平台禁止执行此类危险操作(modify|change|drop)，请联系DBA协助完成!");
-	            $(this).val("提交审核");
-	            $(this).prop('disabled',false);
+				$(this).val("提交审核");
+				$(this).prop('disabled',false);
 			}
 		} else {
 			alert("该页面信息不完整!");
-	        $(this).val("提交审核");
-	        $(this).prop('disabled',false);
+			$(this).val("提交审核");
+			$(this).prop('disabled',false);
 		}
 	} else {
 		alert("此登陆码已过期，页面操作无效!");
