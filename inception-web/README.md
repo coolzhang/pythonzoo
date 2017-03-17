@@ -35,6 +35,7 @@ Prerequisites
     # yum install nginx mysql-community-server
     # bin/Inception --defaults-file=bin/inc.conf   
     # mysql -uroot -h127.0.0.1 -P3306 < ./schema.sql
+    # add an inception user on your dbserver with the necessory privileges, which is used to execute your SQLs.
 Start inception-web.  
 
     # python ./inception-web.py  
