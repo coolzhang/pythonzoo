@@ -27,6 +27,9 @@ if not os.path.exists('./inception-web.conf'):
 	config.set('inception-web','db','test')
 	config.set('inception-web','charsetr','utf8')
 	config.set('inception-web','code-timeout','3600')
+	config.add_section('inception-client')
+	config.set('inception-client','user','inception')
+	config.set('inception-client','password','')
 	with open('./inception-web.conf', 'wb') as configfile:
 		config.write(configfile)
 config.read('./inception-web.conf')
@@ -71,8 +74,8 @@ def inception_audit():
 	code_timeout = now - code
 	if code_timeout < config.getint('inception-web','code-timeout'):
 		online = {
-			"user": "inception",
-			"password": "pass4mysql",
+			"user": config.get("inception-client","user"),
+			"password": config.get("inception-client","password"),
 			"instance": request.values.get("dbinstance",""),
 			"database": request.values.get("dbname",""),
 			"sql": request.values.get("auditcontent",""),
