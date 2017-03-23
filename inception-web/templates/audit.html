@@ -150,7 +150,7 @@
 		var redmineissue = $("#redmineissue").val().trim();
     	var auditcontent = $("#auditcontent").val().trim();
 		if ( dbinstance && dbname && operator && redmineissue && auditcontent) {
-			var unsafesql = (/alter\s+table\s+\w+\s+(modify|drop|change)\s+.*;\s*/im).test(auditcontent);
+			var unsafesql = (/alter\s+table\s+.*\s+(modify|drop|change)\s+.*;\s*/im).test(auditcontent);
 			if (!unsafesql) {
     			$.ajax({
     			    type:"post",
