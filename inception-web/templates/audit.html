@@ -159,8 +159,10 @@
     			    dataType:"json",
     			    //async:false,
     			    success:function(result){
-						if (result == "inception") {
+						if (result == "incserver") {
 							alert("Inception Server出问题了，请联系DBA!");
+						} else if (result == "incuser") {
+							alert("Inception内部用户异常，请联系DBA!");
 						} else if (result == "mysql") {
 							alert("请确认IP、端口以及库名是否匹配");
 						} else {
