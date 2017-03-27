@@ -87,7 +87,10 @@ def inception_audit():
 			conn = MySQLdb.connect(user=online['user'], passwd=online['password'], host=online['instance'].split(':')[0], port=int(online['instance'].split(':')[1]), db=online['database'], connect_timeout=online['connect_timeout'], charset='utf8')
 		except MySQLdb.Error, err:
 			app.logger.error('MySQL Server DBconnect Error %d: %s', err[0],err[1])
-			return jsonify('mysql') 
+			if err[0] == 1045:
+				return jsonify('incuser')
+			else:
+				return jsonify('mysql') 
 
 		inception_server = {
 			"host": config.get("inception-server","host"),
@@ -132,7 +135,7 @@ def inception_audit():
 			return jsonify(audit_result)
 		except MySQLdb.Error, err:
 			app.logger.error('Inception-server DBconnect Error: %s', err)
-			return jsonify('inception')
+			return jsonify('incserver')
 		else:
 			iconn.close()
 
