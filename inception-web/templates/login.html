@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="icon" href="/static/bootstrap-3.3.7-dist/docs/favicon.ico">
+
+    <title>基于Inception的数据库SQL审核系统</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="/static/bootstrap-3.3.7-dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    <link href="/static/bootstrap-3.3.7-dist/docs/assets/css/ie10-viewport-bug-workaround.css" rel="stylesheet">
+
+    <!-- Custom styles for this template -->
+    <link href="/static/bootstrap-3.3.7-dist/docs/examples/cover/cover.css" rel="stylesheet">
+
+    <!-- Just for debugging purposes. Don't actually copy these 2 lines! -->
+    <!--[if lt IE 9]><script src="../../assets/js/ie8-responsive-file-warning.js"></script><![endif]-->
+    <script src="/static/bootstrap-3.3.7-dist/docs/assets/js/ie-emulation-modes-warning.js"></script>
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+	 <script src="/static/bootstrap-3.3.7-dist/js/jquery.min.js"></script>
+  </head>
+
+  <body>
+
+    <div class="site-wrapper">
+
+      <div class="site-wrapper-inner">
+
+        <div class="cover-container">
+
+          <div class="masthead clearfix">
+            <div class="inner">
+				<h3 class="masthead-brand"><a href="http://mysql-inception.github.io/inception-document/">Inception</a></h3>
+              <nav>
+                <ul class="nav masthead-nav">
+                  <li class="active"><a href="#">Home</a></li>
+                  <li><a href="/sqlguide">SQL规范</a></li>
+                  <li><a href="mailto:support@cmug.org">DBA支持</a></li>
+                </ul>
+              </nav>
+            </div>
+          </div>
+
+         <div class="inner cover">
+            <h1 class="cover-heading">基于Inception的数据库SQL审核系统</h1>
+			<div class="row" style="margin-top:30px">
+			  <div class="col-sm-4"> </div>
+			    <form class="col-sm-4"  action="/login" method="post">
+			      <span id="errmsg" style="display:none">{{ errmsg }}</span>
+			      <p class="lead" style="margin-bottom:10px" >
+			        <input name="dyncode" class="form-control" type="text" placeholder="请输入动态登录码"/>
+			      </p>
+                  <p class="lead" style="margin-bottom:10px" >
+			        <button id="login" class="btn btn-primary" type="submit">Enjoy YourSQL!</button>
+			      </p>
+			    </form> 
+			</div>
+          </div>
+
+          <div class="mastfoot">
+            <div class="inner">
+              <p>Cover template for <a href="http://getbootstrap.com">Bootstrap</a>, by <a href="https://twitter.com/mdo">@mdo</a>.</p>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+	<script>
+		if(($("#errmsg").html()).length>0){
+			alert($("#errmsg").html())
+		}
+	</script>
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster --> 
+	<!-- <script src="/static/bootstrap-3.3.7-dist/js/jquery.min.js"></script> -->
+    <script>window.jQuery || document.write('<script src="/static/bootstrap-3.3.7-dict/docs/assets/js/vendor/jquery.min.js"><\/script>')</script>
+    <script src="/static/bootstrap-3.3.7-dist/js/bootstrap.min.js"></script>
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    <script src="/static/bootstrap-3.3.7-dist/docs/assets/js/ie10-viewport-bug-workaround.js"></script>
+  </body>
+</html>
