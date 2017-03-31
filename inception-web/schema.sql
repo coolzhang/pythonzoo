@@ -25,10 +25,10 @@ create table operator_log (
 drop table if exists token;
 create table token (
 	id int not null auto_increment comment '主键ID',
-	code int not null comment '动态登录码（UNIX时间戳-秒数）',
+	token int not null comment '动态登录码（UNIX时间戳-秒数）',
 	ctime timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP comment '创建时间',
 	primary key (id),
-	key code (code)
+	key token (token)
 ) engine=innodb default charset=utf8 comment '动态登录码生成表';
 
 drop table if exists login;
