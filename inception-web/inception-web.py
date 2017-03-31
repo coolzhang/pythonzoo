@@ -10,6 +10,7 @@ import ConfigParser
 import os
 import logging
 from logging.handlers import RotatingFileHandler
+from redmine import Redmine
 
 config = ConfigParser.SafeConfigParser()
 if not os.path.exists('./inception-web.conf'):
@@ -26,53 +27,90 @@ if not os.path.exists('./inception-web.conf'):
 	config.set('inception-web','port','3306')
 	config.set('inception-web','db','test')
 	config.set('inception-web','charsetr','utf8')
-	config.set('inception-web','code-timeout','3600')
+	config.set('inception-web','token-timeout','3600')
+	config.set('inception-web','with-redmine','False')
 	config.add_section('inception-client')
 	config.set('inception-client','user','inception')
 	config.set('inception-client','password','')
+	config.add_section('redmine')
+	config.set('redmine','username','')
+	config.set('redmine','password','')
+	config.set('redmine','assigned_to','')
 	with open('./inception-web.conf', 'wb') as configfile:
 		config.write(configfile)
 config.read('./inception-web.conf')
 
 app = Flask(__name__)
+
 @app.route('/', methods=['get'])
-def inception_home():
-	return render_template('index.html')
+def login_pre():
+	return render_template('login-pre.html')
+
+@app.route('/tokengenbyissue', methods=['post'])
+def tokengenbyissue():
+	issue = request.values.get('redmineissue','')
+	if issue:
+		if issue.isdigit():
+			try:
+				redmine = Redmine('http://redmine.intra.wepiao.com', username=config.get("redmine","username"), password=config.get("redmine","password"))
+				redmine_issue = redmine.issue.get(int(issue))
+				assigned_to = config.get("redmine","assigned_to")
+				if assigned_to.lower() == redmine_issue.assigned_to.name.lower():
+					issue_exist = 'select issue,token,(expire + unix_timestamp(ctime)) as deadline from login where issue=%d' %(int(issue))
+					issue, token, deadline = incwebDB_exec(issue_exist, 'select')
+					if issue:
+						now = int(time.time())
+						if now < deadline:
+							res, msg = token_check(token)
+							if not res:
+								token_new = token_maker()
+								token_update = 'update login set token=%d where token=%d;' %(token_new, token)
+								incwebDB_exec(token_update, 'insert')
+							token_new = token
+							return jsonify({"success": True, "token": token_new})
+						else:
+							return jsonify({"success": False, "errmsg": u'此工单号已过期，请重新创建工单!'})
+					else:
+						token = token_maker()
+						issue_save = 'insert into login(issue, token) values(%d, %d);' %(int(issue), token)
+						incwebDB_exec(issue_save, 'insert')
+						return jsonify({"success": True, "token": token})
+				else:
+					return jsonify({"success": False, "errmsg": u'此工单号无效!'})
+			except Exception, err:
+				print(err)
+				return jsonify({"success": False, "errmsg": u'此工单号不存在!'})
+		else:
+			return jsonify({"success": False, "errmsg": u'此工单号不合法!'})
+	else:
+		return jsonify({"success": False, "errmsg": u'请先输入工单号!'})
 
 @app.route('/login', methods=['post','get'])
-def inception_login():
+def login():
 	if request.method == 'GET':
-		return render_template('index.html')
+		return render_template('login.html')
 
-	code = request.values.get('dyncode','')
-	if code:
-		if code.isdigit():
-			sql = 'select code from dyncode where code=%d' % int(code)
-			code_exist = sqlaudit_query(sql, 'select')
-			now = int(time.time())
-			code_timeout = now - int(code)
-			if code_exist:
-				if code_timeout < config.getint('inception-web','code-timeout'):
-					return redirect(url_for('inception_web', icode=code))
-				else:
-					return render_template('index.html', errmsg=u'此动态验证码已过期，请联系DBA!')
-			else:
-				return render_template('index.html', errmsg=u'此动态验证码无效，不要尝试破解哦!')
-		else:
-			return render_template('index.html', errmsg=u'此动态验证码不合法!')
+	token = request.values.get('dyncode','')
+	res, msg = token_check(token)
+	if res:
+		return redirect(url_for('audit', token=token))
 	else:
-		return render_template('index.html', errmsg=u'请先输入动态验证码!')
+		return render_template('login-pre.html', errmsg=msg)
 
-@app.route('/inception/<icode>',methods=['get'])
-def inception_web(icode):
-	return render_template('audit.html')
+@app.route('/audit/<token>', methods=['get'])
+def audit(token):
+	res, msg = token_check(token)
+	if res:
+		return render_template('sqlaudit.html')
+	else:
+		return render_template('login-pre.html', errmsg=msg)
 
 @app.route('/sqlaudit',methods=['post','get'])
-def inception_audit():
-	code = int(request.headers['Referer'].split('/')[-1])
+def audit_exec():
+	token = int(request.headers['Referer'].split('/')[-1])
 	now = int(time.time())
-	code_timeout = now - code
-	if code_timeout < config.getint('inception-web','code-timeout'):
+	token_timeout = now - token
+	if token_timeout < config.getint("inception-web","token-timeout"):
 		online = {
 			"user": config.get("inception-client","user"),
 			"password": config.get("inception-client","password"),
@@ -83,6 +121,17 @@ def inception_audit():
 			"redmineissue": request.values.get("redmineissue",""),
 			"connect_timeout": 3
 		}
+
+		if config.getboolean("inception-web", "with-redmine"):
+			try:
+				redmine = Redmine('http://redmine.intra.wepiao.com', username=config.get("redmine","username"), password=config.get("redmine","password"))
+				redmine_issue = redmine.issue.get(int(online['redmineissue']))
+				if online['operator'] != ''.join(redmine_issue.author.name.split())[1:]:
+					return jsonify('redmine_author')
+			except Exception, err:
+				print(err)
+				return jsonify('redmine_issue')
+
 		try:
 			conn = MySQLdb.connect(user=online['user'], passwd=online['password'], host=online['instance'].split(':')[0], port=int(online['instance'].split(':')[1]), db=online['database'], connect_timeout=online['connect_timeout'], charset='utf8')
 		except MySQLdb.Error, err:
@@ -125,7 +174,7 @@ def inception_audit():
 				audit_result.append([r_id, r_stagestatus, r_sql, r_exetime, r_err])
 				errlevels.append(r_errlevel)
 				if r_errlevel != 0:
-					sql = 'insert into operator_log(operator,redmineissue,errlevel,errmsg) values("%s",%s,%d,"%s");' %(online['operator'], online['redmineissue'], r_errlevel, r_err)
+					sql = 'insert into operator_log(operator,issue,errlevel,errmsg) values("%s",%s,%d,"%s");' %(online['operator'], online['redmineissue'], r_errlevel, r_err)
 					sqlaudit_query(sql, 'insert')
 			icur.close()
 
@@ -139,8 +188,20 @@ def inception_audit():
 		else:
 			iconn.close()
 
+@app.route('/tokenKznxVczC', methods=['get'])
+def token():
+	return render_template('token.html')
 
-def sqlaudit_query(sql, sqltype):
+@app.route('/tokengen', methods=['post'])
+def tokengen():
+	token = token_maker()
+	return jsonify(token)
+
+@app.route('/sqlguide', methods=['get'])
+def sqlguide():
+	return render_template('sqlguide.html')
+
+def incwebDB_exec(sql, sqltype):
 	inception_web = {
 		"host": config.get("inception-web","host"),
 		"user": config.get("inception-web","user"),
@@ -157,7 +218,7 @@ def sqlaudit_query(sql, sqltype):
 		if sqltype == 'select':
 			row = cursor.fetchone()
 			if row:
-				return row[0]
+				return row
 		conn.commit()
 		cursor.close()
 	except MySQLdb.Error, err:
@@ -165,20 +226,36 @@ def sqlaudit_query(sql, sqltype):
 	else:
 		conn.close()
 
-@app.route('/sqlguide', methods=['get'])
-def sqlguide():
-	return render_template('sqlguide.html')
+def token_maker():
+	token = int(time.time())
+	sql = 'insert into token(token) values(%d);' % token
+	incwebDB_exec(sql, 'insert')
+	return token
 
-@app.route('/inception-auth', methods=['get'])
-def coder():
-	return render_template('coder.html')
-
-@app.route('/icode', methods=['get'])
-def code():
-	code = int(time.time())
-	sql = 'insert into dyncode(code) values(%d);' % code
-	sqlaudit_query(sql, 'insert')
-	return jsonify(code)
+def token_check(token):
+	if token:
+		if str(token).isdigit():
+			sql = 'select token from token where token=%d' % int(token)
+			token_exist = incwebDB_exec(sql, 'select')
+			now = int(time.time())
+			token_timeout = now - int(token)
+			if token_exist:
+				if token_timeout < config.getint('inception-web','token-timeout'):
+					result = True
+					message = u'此动态验证码有效!'
+				else:
+					result = False
+					message = u'此动态验证码已过期，请联系DBA!'
+			else:
+				result = False
+				message = u'此动态验证码无效，不要尝试破解哦!'
+		else:
+			result = False
+			message = u'此动态验证码不合法!'
+	else:
+		result = False
+		message = u'请先输入动态验证码!'
+	return (result, message)
 
 if __name__ == '__main__':
 	formatter = logging.Formatter(fmt='%(asctime)s - %(levelname)s - %(message)s',datefmt='%Y-%m-%d %H:%M:%S')
@@ -187,4 +264,4 @@ if __name__ == '__main__':
 	handler.setLevel(logging.ERROR)
 	app.logger.addHandler(handler)
 
-	app.run('0.0.0.0',debug=True)
+	app.run('0.0.0.0', debug=True)
