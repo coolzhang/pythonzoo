@@ -32,7 +32,7 @@ It's the [Inception](http://mysql-inception.github.io/inception-document/) based
 Prerequisites  
 
     # pip install flask gunicorn  
-    # pip install python-redmine    // If you want to make inception-web working with [Redmine](http://www.redmine.org), please install the package. 
+    # pip install python-redmine    // If you want to make inception-web working with Redmine(http://www.redmine.org), please install the package. 
     # yum install nginx mysql-community-server
     # bin/Inception --defaults-file=bin/inc.conf   
     # mysql -uroot -h127.0.0.1 -P3306 < ./schema.sql
@@ -54,3 +54,7 @@ Goto login/portal page.
 Enter your code on home page to login the **SQL Audit PLatform**. And then enjoy your SQL! So easy:P 
 
  *<mark>Note:</mark> each code will expire in 3600 seconds, which can be set by the code_timeout variable of the inception-web group in inception-web.conf. 
+
+### Acknowledgement
+
+Thanks a ton to Xiaobai who is my colleague and also Python teacher:P
