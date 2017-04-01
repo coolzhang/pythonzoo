@@ -28,7 +28,7 @@ if not os.path.exists('./inception-web.conf'):
 	config.set('inception-web','db','test')
 	config.set('inception-web','charsetr','utf8')
 	config.set('inception-web','token-timeout','3600')
-	config.set('inception-web','with-redmine','False')
+	config.set('inception-web','with-redmine','True')
 	config.add_section('inception-client')
 	config.set('inception-client','user','inception')
 	config.set('inception-client','password','')
@@ -56,9 +56,10 @@ def tokengenbyissue():
 				redmine_issue = redmine.issue.get(int(issue))
 				assigned_to = config.get("redmine","assigned_to")
 				if assigned_to.lower() == redmine_issue.assigned_to.name.lower():
-					issue_exist = 'select issue,token,(expire + unix_timestamp(ctime)) as deadline from login where issue=%d' %(int(issue))
-					issue, token, deadline = incwebDB_exec(issue_exist, 'select')
-					if issue:
+					issue_exist = 'select issue,token,(expire + unix_timestamp(ctime)) as deadline from login where issue=%d;' %(int(issue))
+					result = incwebDB_exec(issue_exist, 'select')
+					if result:
+						issue, token, deadline = result
 						now = int(time.time())
 						if now < deadline:
 							res, msg = token_check(token)
