@@ -176,12 +176,12 @@ def audit_exec():
 				errlevels.append(r_errlevel)
 				if r_errlevel != 0:
 					sql = 'insert into operator_log(operator,issue,errlevel,errmsg) values("%s",%s,%d,"%s");' %(online['operator'], online['redmineissue'], r_errlevel, r_err)
-					sqlaudit_query(sql, 'insert')
+					incwebDB_exec(sql, 'insert')
 			icur.close()
 
 			if sum(errlevels) == 0:
 				sql = 'insert into inception_log(dbinstance,dbname,ioutput) values("%s","%s","%s");' %(online["instance"], online["database"], audit_result)
-				sqlaudit_query(sql, 'insert')
+				incwebDB_exec(sql, 'insert')
 			return jsonify(audit_result)
 		except MySQLdb.Error, err:
 			app.logger.error('Inception-server DBconnect Error: %s', err)
