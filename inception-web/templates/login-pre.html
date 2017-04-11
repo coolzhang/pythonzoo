@@ -43,14 +43,14 @@
 	    <div class="form-group">
 	      <div class="input-group">
 			  <span id="errmsg" style="display:none">{{ errmsg }}</span>
-			  <input id="redmineissue" type="text" class="form-control" value="" placeholder="Enter your issue#">
+			  <input id="redmineissue" type="text" class="form-control" value="" placeholder="输入工单号">
 	      </div>
 		</div>
 	    <button id="button" type="button" class="btn btn-primary">生成动态码</button>
 	  </form>
 	  <p>
 	  <div class="input-group">
-		  <input id="code" type="text" class="form-control" value="" placeholder="Here is your token">
+		  <input id="code" type="text" class="form-control" value="" placeholder="获得动态登录码">
 	  </div>
 	  <br>
       <p>使用动态码登录 <a href="/login">数据库SQL审核系统</a> Enjoy YourSQL!</p>
@@ -65,7 +65,19 @@
 	<script>
 		if(($("#errmsg").html()).length>0) {
 			alert($("#errmsg").html())
-		}
+		};
+
+		function updateRedmine(issue) {
+			$.ajax({
+				type:"post",
+				data:{"redmineissue":issue},
+				url:"/redmine",
+				dataType: "json",
+				async:true,
+				success:function(result) {
+				}
+			})
+		};
 
 		$("#button").on("click",function () {
 			var redmineissue = $("#redmineissue").val();
@@ -78,6 +90,7 @@
 				success:function(result) {
 					if (result.success == true) {
 						$("#code").val(result.token)
+						updateRedmine(redmineissue)
 					} else {
 						alert(result.errmsg)
 					}
