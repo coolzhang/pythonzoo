@@ -86,6 +86,22 @@ def tokengenbyissue():
 	else:
 		return jsonify({"success": False, "errmsg": u'请先输入工单号!'})
 
+@app.route('/redmine', methods=['post'])
+def redmine_update():
+	issue = request.values.get('redmineissue','')
+	if issue:
+		redmine = Redmine('http://redmine.intra.wepiao.com', username=config.get("redmine","username"), password=config.get("redmine","password"))
+		redmine_issue = redmine.issue.get(int(issue))
+		author_id = redmine_issue.author.id
+		update = redmine.issue.update(int(issue), assigned_to_id=author_id, status_id=3)
+		if update:
+			result = True
+			message = issue + u'工单跟新成功!'
+		else:
+			result = False
+			message = issue + u'工单跟新失败!'
+	return jsonify({"success": result, "errmsg": message})
+
 @app.route('/login', methods=['post','get'])
 def login():
 	if request.method == 'GET':
@@ -257,6 +273,7 @@ def token_check(token):
 		result = False
 		message = u'请先输入动态验证码!'
 	return (result, message)
+
 
 if __name__ == '__main__':
 	formatter = logging.Formatter(fmt='%(asctime)s - %(levelname)s - %(message)s',datefmt='%Y-%m-%d %H:%M:%S')
