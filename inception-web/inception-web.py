@@ -93,7 +93,7 @@ def redmine_update():
 		redmine = Redmine('http://redmine.intra.wepiao.com', username=config.get("redmine","username"), password=config.get("redmine","password"))
 		redmine_issue = redmine.issue.get(int(issue))
 		author_id = redmine_issue.author.id
-		update = redmine.issue.update(int(issue), assigned_to_id=author_id, status_id=3)
+		update = redmine.issue.update(int(issue), assigned_to_id=author_id, status_id=3, notes='执行完毕后，请更新进度为100%。')
 		if update:
 			result = True
 			message = issue + u'工单跟新成功!'
